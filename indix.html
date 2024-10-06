@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>طلب تاكسي</title>
+</head>
+<body>
+    <h1 style="text-align: center;">طلب أقرب سائق</h1>
+    <button id="requestDriver" style="display: block; margin: 0 auto;">طلب أقرب سائق</button>
+    <p id="output" style="text-align: center;"></p>
+
+    <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-database.js"></script>
+    <script>
+        // تكوين Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyCow0kJbcJ7OUzaHOBqXp1hF1LPSxb6dBo",
+            authDomain: "alnashme-tawsel.firebaseapp.com",
+            databaseURL: "https://alnashme-tawsel-default-rtdb.firebaseio.com",
+            projectId: "alnashme-tawsel",
+            storageBucket: "gs://alnashme-tawsel.appspot.com",
+            messagingSenderId: "76863416572",
+            appId: "1:76863416572:android:e75569b3ef02142baf8f79"
+        };
+
+        // تهيئة Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        document.getElementById('requestDriver').addEventListener('click', function() {
+            if (navigator.geolocation) {
+                // طلب إذن تحديد الموقع
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        const latitude = position.coords.latitude;
+                        const longitude = position.coords.longitude;
+
+                        // إرسال إحداثيات العميل إلى قاعدة بيانات Firebase
+                        firebase.database().ref('requests').push({
+                            customerLocation: {
+                                latitude: latitude,
+                                longitude: longitude
+                            },
+                            status: 'pending'
+                        });
+
+                        document.getElementById('output').innerText = 'تم إرسال الطلب، جاري البحث عن أقرب سائق...';
+                    },
+                    function(error) {
+                        document.getElementById('output').innerText = "لم يتم تحديد الموقع.";
+                    }
+                );
+            } else {
+                document.getElementById('output').innerText = "المتصفح لا يدعم تحديد الموقع.";
+            }
+        });
+    </script>
+</body>
+</html>
